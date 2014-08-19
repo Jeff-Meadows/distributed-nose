@@ -2,7 +2,7 @@ include setup.py
 include AUTHORS
 include LICENSE
 include MANIFEST.in
-include README.md
+include README.rst
 include CHANGELOG.md
 recursive-include distributed_nose *.py
 prune *.pyc
