@@ -8,6 +8,7 @@ from nose.util import test_address
 
 logger = logging.getLogger('nose.plugins.distributed_nose')
 
+
 class DistributedNose(Plugin):
     """
     Distribute a test run, shared-nothing style, by specifying the total number
@@ -103,8 +104,30 @@ class DistributedNose(Plugin):
 
         return True
 
+    def getCannotSplit(self, testObject):
+        obj_self = getattr(testObject, '__self__', None)
+        klass = None
+
+        if obj_self is not None:
+            klass = getattr(testObject, '__class__', None)
+        else:
+            if hasattr(testObject, 'im_class'):
+                klass = testObject.im_class
+
+        if klass is not None:
+            return not getattr(klass, '__distributed_can_split__', True)
+
+        filepath, module, call = test_address(testObject)
+        return not getattr(module, '__distributed_can_split__', True)
+
     def validateName(self, testObject):
         filepath, module, call = test_address(testObject)
+
+        # By default, we assume modules can be split, but if not, assign all tests in the module to one node
+        if self.getCannotSplit(testObject):
+            node = self.hash_ring.get_node(module)
+            if node != self.node_id:
+                return False
 
         node = self.hash_ring.get_node('%s.%s' % (module, call))
         if node != self.node_id:

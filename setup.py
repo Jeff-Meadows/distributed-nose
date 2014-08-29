@@ -15,7 +15,6 @@ CLASSIFIERS = [
     'Programming Language :: Python',
     'Programming Language :: Python :: 2.6',
     'Programming Language :: Python :: 2.7',
-    'Programming Language :: Python :: 3.3',
     'Operating System :: OS Independent',
     'Operating System :: POSIX',
     'Operating System :: Microsoft :: Windows',
@@ -94,7 +93,7 @@ setup(
         'nose',
         'hash_ring',
     ],
-    entry_points = {
+    entry_points={
         'nose.plugins.0.10': [
             'distributed = distributed_nose.plugin:DistributedNose',
         ],

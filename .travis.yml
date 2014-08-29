@@ -1,0 +1,13 @@
+language: python
+env:
+  - TOX_ENV=py26
+  - TOX_ENV=py27
+  - TOX_ENV=pypy
+  - TOX_ENV=nose-1-0
+  - TOX_ENV=nose-1-3
+# commands to install dependencies
+install:
+  - pip install tox --use-mirrors
+# commands to run
+script:
+  - tox -e $TOX_ENV
