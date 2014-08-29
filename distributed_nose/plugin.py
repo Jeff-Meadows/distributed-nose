@@ -115,17 +115,19 @@ class DistributedNose(Plugin):
                 klass = testObject.im_class
 
         if klass is not None:
-            return not getattr(klass, '__distributed_can_split__', True)
+            if not getattr(klass, '__distributed_can_split__', True):
+                return klass
 
         filepath, module, call = test_address(testObject)
-        return not getattr(module, '__distributed_can_split__', True)
+        return module if not getattr(module, '__distributed_can_split__', True) else None
 
     def validateName(self, testObject):
         filepath, module, call = test_address(testObject)
 
         # By default, we assume modules can be split, but if not, assign all tests in the module to one node
-        if self.getCannotSplit(testObject):
-            node = self.hash_ring.get_node(module)
+        cannot_split = self.getCannotSplit(testObject)
+        if cannot_split:
+            node = self.hash_ring.get_node('%s' % cannot_split)
             if node != self.node_id:
                 return False
 
