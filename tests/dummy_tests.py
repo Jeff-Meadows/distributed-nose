@@ -21,7 +21,7 @@ class TC2(TC1):
 
 
 class TC3(unittest.TestCase):
-    __distributed_can_split__ = False
+    _distributed_can_split_ = False
 
     def test_method1(self):
         assert True

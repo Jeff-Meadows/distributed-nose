@@ -115,11 +115,11 @@ class DistributedNose(Plugin):
                 klass = testObject.im_class
 
         if klass is not None:
-            if not getattr(klass, '__distributed_can_split__', True):
+            if not getattr(klass, '_distributed_can_split_', True):
                 return klass
 
         filepath, module, call = test_address(testObject)
-        return module if not getattr(module, '__distributed_can_split__', True) else None
+        return module if not getattr(module, '_distributed_can_split_', True) else None
 
     def validateName(self, testObject):
         filepath, module, call = test_address(testObject)

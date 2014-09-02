@@ -256,6 +256,18 @@ Alternatively, you can use the environment variables:
 * `NOSE_NODES`
 * `NOSE_NODE_NUMBER`
 
+### Specifying how tests are split
+
+By default, each test function or method can be run on a different machine. This,
+however, is not always the best way to split tests; sometimes it's preferable to
+keep tests in a certain class or module on the same machine.
+
+Simply specify
+
+    _distributed_can_split_ = False
+
+in the class or module for which the containing tests should not be split.
+
 ### Temporarily disabling test distribution
 
 In the case that you're using environment variables
