@@ -104,7 +104,17 @@ class DistributedNose(Plugin):
 
         return True
 
-    def getCannotSplit(self, testObject):
+    def getLowestSplitLevelObject(self, testObject):
+        """
+        Get an object name to hash for determining which node will run this test.
+        If the containing module cannot be split, return the module name.
+        If the module can be split, but the containing class cannot, return the module dot class name.
+        If the module and class can be split, return the module.test name.
+        """
+        filepath, module, call = test_address(testObject)
+        if not getattr(module, '_distributed_can_split_', True):
+            return '%s' % module
+
         obj_self = getattr(testObject, '__self__', None)
         klass = None
 
@@ -116,22 +126,12 @@ class DistributedNose(Plugin):
 
         if klass is not None:
             if not getattr(klass, '_distributed_can_split_', True):
-                return klass
+                return '%s.%s' % (module, klass)
 
-        filepath, module, call = test_address(testObject)
-        return module if not getattr(module, '_distributed_can_split_', True) else None
+        return '%s.%s' % (module, call)
 
     def validateName(self, testObject):
-        filepath, module, call = test_address(testObject)
-
-        # By default, we assume modules can be split, but if not, assign all tests in the module to one node
-        cannot_split = self.getCannotSplit(testObject)
-        if cannot_split:
-            node = self.hash_ring.get_node('%s' % cannot_split)
-            if node != self.node_id:
-                return False
-
-        node = self.hash_ring.get_node('%s.%s' % (module, call))
+        node = self.hash_ring.get_node(self.getLowestSplitLevelObject(testObject))
         if node != self.node_id:
             return False
 
